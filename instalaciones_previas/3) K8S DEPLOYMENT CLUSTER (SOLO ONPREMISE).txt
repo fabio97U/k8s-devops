@@ -1,0 +1,31 @@
+1.DESACTIVAR MEMORIA DE INTERCAMBIO EN LOS SERVES (EN REINICIOS TAMBIEN ES NECESARIO, ESCRIBIRLO NO SE PUEDE COPIAR Y PEGAR)
+	> sudo swapoff -a
+
+2.ESTABLECER UN NODO PRINCIPAL (NODO MAESTRO (192.168.1.31))
+	> sudo hostnamectl set-hostname master-node
+
+3.ESTABLECER NODO TRABAJADOR (NODO TRABAJO)
+	> sudo hostnamectl set-hostname edutecnodo02
+
+4.INICIALIZAR K8S EN EL (NODO MAESTRO)
+	> sudo kubeadm init --pod-network-cidr=10.244.0.0/16
+
+5.DIRECTORIO DEL CLUSTER (NODO MAESTRO)
+	> mkdir -p $HOME/.kube
+	> sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+	> sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+6.IMPLEMENTACION DE RED POD EN CLUSTER (flannel virtual network) (NODO MAESTRO)
+	> sudo kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+
+7.VERIFICACION DE TODO CORRIENDO Y COMUNICANDOSE (NODO MAESTRO)
+	> kubectl get pods --all-namespaces
+
+8.UNIR NODOS DE TRABAJO AL CLUSTER ( HASH OBTENIDO EN EL PASO 4 ) (NODO TRABAJO)
+	> kubeadm join 192.168.1.31:6443 --token o0oinr.s33mzvjt04k67l4u --discovery-token-ca-cert-hash sha256:48fe08920eefd24d602cd6f0482a8d94967c1b1fa93e560314c9f18f4a92b37b
+        
+9.MOSTRAR NODOS DE TRABAJO (NODO MAESTRO)
+	> kubectl get nodes
+
+
+	

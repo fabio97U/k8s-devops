@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: edutec
+  labels:
+    name: edutec
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: res-quota
+  namespace: edutec
+spec:
+  hard:
+    requests.cpu: 900m
+    requests.memory: 1Gi
+    limits.cpu: 1700m
+    limits.memory: 2.5Gi

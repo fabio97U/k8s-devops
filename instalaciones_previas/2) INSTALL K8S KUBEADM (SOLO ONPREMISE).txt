@@ -1,0 +1,19 @@
+===========================================INSTALL K8S UBUNTU 18.04 (kubeadm)=================================================
+INSTALAR CURL (POR DEFECTO YA ESTA INSTALADO EN EL SO)
+	> sudo apt-get install curl
+
+CLAVE DE FIRMA
+	> curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add
+
+AGREGAR EL REPOSITORIO DEL SOFTWARE 
+	> sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
+
+INSTALAR HERRAMIENTAS DE K8S
+	> sudo apt-get install kubeadm kubelet kubectl
+	> sudo apt-mark hold kubeadm kubelet kubectl
+
+DESINSTALAR K8S
+	> kubeadm reset
+	  sudo apt-get purge kubeadm kubectl kubelet kubernetes-cni kube* -y
+	  sudo apt-get autoremove -y
+	  sudo rm -rf ~/.kube

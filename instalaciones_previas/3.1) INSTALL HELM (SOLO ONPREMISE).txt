@@ -1,0 +1,26 @@
+Link oficial: https://helm.sh/docs/intro/install/
+
+Install forma A
+> git clone https://github.com/helm/helm.git
+> cd helm
+> make
+> helm version
+> helm repo update
+
+Install forma B
+> curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+> chmod 700 get_helm.sh
+> ./get_helm.sh
+
+Reinstalar Chart
+> helm upgrade --install netdata netdata-helmchart/charts/netdata
+
+Enviar argumentos
+helm install netdata netdata/netdata \
+    --set image.tag=latest
+    <MAS ARQUMENTOS AQUI>
+
+Uninstall
+> which helm
+	OUTPUT: /some/path/to/helm
+> rm /some/path/to/helm

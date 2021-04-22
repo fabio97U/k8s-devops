@@ -1,0 +1,317 @@
+***===========LINUX===========***
+Version Linux: > lsb_release -a
+Disco duro:    > df -h
+Memoria RAM:   > dmidecode --type memory | less
+(configurar en KWorker´s)
+Correr comando en automatico: > sudo nano /etc/rc.local
+				#COMANDO A EJECUTAR
+Colocar un alias a un comando: > nano ~/.bashrc
+				alias <COMANDO>='<RENOMBRADO_COMANDO>'
+				alias kubectl='kc'
+Actualiza ubuntu:
+> apt-get -yqq update
+
+Borrar carpeta
+> rm -rf RUTACARPETA
+
+Tarear programada al inciar el SO
+> crontab -u <USERNAME> -e
+> crontab -l
+> crontab -e
+	@reboot [COMANDO]
+	@reboot sudo swapoff -a
+	@reboot chown -R 1001:1001 /moodle /bitnami/moodle/
+	@reboot chown -R 1001:1001 /mariadb /bitnami/mariadb/
+
+
+Habilitar PING: https://www.sysadmit.com/2016/03/linux-respuesta-ping-habilitar-o-deshabilitar.html
+
+> uname -a
+> lsb_release -a
+> sudo lsb_release --code | cut -f2
+Proceso que estan corriendo en linux:
+> ps -aux
+
+Tracert route linux:
+> apt-get install -yqq traceroute
+> traceroute google.com
+
+Tablas de rutas linux:
+> iptables -r nat -L- -n
+Desinstalar programa linux
+> sudo apt-get --purge remove [nombre del programa]
+
+Instalar ssh:
+> sudo apt-get install openssh-server
+> sudo systemctl enable ssh
+> sudo systemctl start ssh
+
+Validar estado de servicio 
+> systemctl status SERVICIONAME
+> service SERVICIONAME status
+
+Para verificar que se puede trabajar con el almacenamiento en la maquina virtual (si sale output se puede trabajar)
+> sudo grep device-mapper /proc/devices
+
+
+Deshabilitar memoria swap
+> sudo swapoff -a
+
+
+***===========DOCKER===========***
+Copiar archivo a contenedor
+> docker cp mi_archivo_a_copiar.txt hungry_elgamal:/var/www/html
+
+Para ver los logs de los contendores en tiempo real
+> docker logs ELEARN_CONTENEDOR3 -ft
+
+Conectarse a un contenedor
+> docker exec -i -t myxampp-pruebas /bin/bash
+
+Ejecutar un proceso dentro de un contenedor
+> docker exec -d ELEARN_CONTENEDOR2 <COMANDO A EJECUTAR DENTRO>
+> docker exec -d ELEARN_CONTENEDOR2 touch /etc/nuevo_fichero
+
+Historico de como se a creado el contenedor:
+> docker history 0b2f282d1ee7
+
+Correr un Dockerfile
+> docker build -t="fabioramos97/web" .
+
+
+"CONTAINER_ID: PUEDES PONER SOLO LOS 3 PRIMEROS CARACTERES"
+CRTL + P + Q: Salir del contenedor sin cerrarlo con el comando > exit 
+ingresar a un contendor
+> dokcer attach <CONTAINER_ID>
+
+***===========K8S===========***
+para ver shortcuts y el nombre del KIND
+> kubectl api-resources
+Conectar a pod
+> kubectl exec -it <POD NAME> -c <CONTENEDORNAME> -- sh
+Describir un pod
+> kubectl describe pod nginx-deployment-5d59d67564-ck6lg
+Logs de un pod
+> kubectl logs nginx-deployment-5d59d67564-ck6lg -f
+(para ver la verision para yaml)
+> kubectl api-versions
+
+AGREGAR UN PAQUETE EN POD
+> apk add -U <APPNAME>
+
+HISTORIA DEL DEPLOYMENT
+> kubectl rollout history deployment <DEPLOY NAME>
+> kubectl rollout history deployment <DEPLOY NAME> --revision=<NUMERO DE REVISION>
+
+ESTATUS DEL DEPLOYMENT
+> kubectl rollout status deployment <DEPLOY NAME>
+
+APLICAR UN DEPLOYMENT, --record: cuarda el record de la history
+> kubectl apply -f <ARCHIVO YAML> --record
+
+REGRESAR A UNA VERSION ANTERIOR DEL DEPLOYEMNT
+> kubectl rollout undo deployment <DEPLOY NAME> --to-revision=<NUMERO DE REVISION>
+
+====***TERMINOS***====
+- PODS
+- REPLICASETS
+- DEPLOYMENT
+- SERVICES
+- INGRESS
+- NAMESPACES
+- VARIABLES DE ENTORNO, CONFIGMAPS, SECRETS
+- VOLUMENES
+
+====***COMANDOS***====
+CONFIGURACION K8S
+> kubectl config view
+
+CREAR CONTEXTO
+> kubectl config set-context edutec-context --namespace=edutec --cluster=kubernetes --user=kubernetes-admin
+
+CAMBIAR CONTEXTO
+> kubectl config use-context edutec-context
+
+PERMISOS CONTENEDORES NO ROOT
+> sudo chown -R 1001:1001 /mariadb /bitnami/mariadb/
+
+====******COMANDOS-PODS******====
+CREAR POD A PARTIR DE UN ARCHIVO YAML
+> kubectl create -f [filename].yaml
+
+CREAR POD TEMP
+> kc run --rm -ti podtest --image=nginx:alpine -- sh
+
+LISTAR PODS
+> kubectl get pods
+
+VERIFICAR EN QUE NODO SE EJECUTAN LOS PODS
+> kubectl get pod -o wide
+
+ELIMINAR PODS
+> kubectl delete pod [podname]
+
+OBNENER LOS LOG DE UN POD
+> kubectl logs [podname]
+
+CONECTARSE A CONTENEDOR
+> kubectl exec -it [podname] -- /bin/bash
+
+REDIRIGIR PUERTO DE LOCALHOST AL DE LA APLICACION
+> kubectl port-forward [podname] 8080:80
+
+EDITAR ARCHIVO YAML
+> kubectl edit pod [podname]
+
+====******COMANDOS-LABELS******====
+OBTENER LAS LABELS 
+> kubectl get pods --show-labels
+
+Los labels se definen en la seccion metadata de los .yaml AGREGAR LABEL A POD
+> kubectl label pods [podname] service=web
+
+BUSCAR POR LABEL
+> kubectl get pods -l service=web
+
+====******COMANDOS-REPLICASET******====
+CREAR
+> kubectl create -f [filename].yaml
+
+LISTAR REPLICAS
+> kubectl get rs
+
+VERIFICAR LABELS
+> kubectl get rs --show-labels
+
+ESCALAR REPLICAS
+> kubectl scale rs nginx --replicas=5
+
+ELIMINAR REPLICAS
+> kubectl delete rs nginx
+
+====******COMANDOS-DEPLOYMENT******====
+CREAR
+> kubectl create -f [filename].yaml
+
+LISTAR DEPLOY
+> kubectl get deploy
+
+ESCALAR DEPLOYMENT
+> kubectl scale deployment nginx --replicas=3
+
+ACTUALIZAR IMAGEN
+> kubectl set image deployment nginx nginx=nginx:1.13 --all
+Ó
+> kubectl edit deployment nginx (MODIFICAR EL .YAML)
+
+DESCRIBIR DEPLOY
+> kubectl describe deployment nginx
+
+DESCRIBIR DEPLOY FORMATO YAML
+> kubectl get deployment nginx -o yaml
+
+VERIFICAR LABELS
+> kubectl get deployment --show-labels
+
+VERIFICAR ESTADOS DE ACTUALIZACION
+> kubectl rollout status deployment nginx
+
+HISTORIAL DE DEPLOYMENTS
+> kubectl rollout history deployment nginx
+> kubectl rollout history deployment nginx --revision=2
+
+RESTAURAR REVISION 
+> kubectl rollout undo deployment nginx --to-revision=1
+
+ELIMINAR DEPLOYMENT
+> kubectl delete deployment nginx
+
+====******COMANDOS-ENDPOINTS******====
+LISTAR
+> kubectl get endpoints
+
+DESCRIPCION
+> kubectl describe endpoints nginx-svc	
+
+====******COMANDOS-SERVICES******====
+CREAR 
+> kubectl create -f [filename].yaml
+
+LISTAR SERVICIOS
+> kubectl get svc
+
+EDITAR SERVICIOS
+> kubectl edit service/nginx
+
+BORRAR SERVICIO
+> kubectl delete service nginx
+
+CARGAR APLICACIONES LOCALES EN EL CLUSTER
+> 10.100.24.71:8080
+> servicename:8080
+
+CARGAR APLICACIONES LOCALES EN EL CLUSTER CON NAMESPACE
+> 10.100.24.71:8080
+>  servicename.namespace.svc.cluster.local:8080
+
+====******COMANDOS-HORIZONTALPODSCALER******====
+CREAR
+> kubectl autoscale deployment.apps/nginx-deployment --min=7 --max=10 --cpu-percent=80
+
+LISTAR
+> kubectl get horizontalpodscaler
+
+BORRAR
+> kubectl delete horizontalpodautoscaler nginx-deployment
+
+====******COMANDOS-NAMESPACES******====
+CREAR
+> kubectl create ns proyecto1
+LISTAR
+> kubectl get namespaces
+CARACTERISTICAS
+> kubectl describe ns proyecto1
+DEFINICION
+> kubectl get ns proyecto1 -o yaml
+ELIMINAR
+> kubectl delete ns proyecto1
+
+====******COMANDOS-SECRETS******====
+CREAR ARCHIVO YAML
+> kubectl create secret generic db-user-pass \
+	--from-file=username=./username.txt \
+	--from-file=password=./password.txt
+
+> kubectl create secret generic dev-db-secret \
+	--from-literal=username=devuser \
+	--from-literal=password='S!B\*d$zDsb='
+LISTAR
+> kubectl get secrets
+> kubectl get secret mariadb-pass -o yaml
+> echo 'cGFzc3dvcmQxMjM=' | base64 --decode
+
+
+***===========GIT===========***
+Iniciar git a un repositorio
+> git init
+Setear el remote origen
+> git remote set-url origin https://fabioramos0658@dev.azure.com/fabioramos0658/DIN-Dev/_git/Inscripciones
+Push a la rama
+> git push -u origin --all
+Rama actual
+> git branch
+Crear nueva rama
+> git branch branchName
+Cambiar a una rama
+> git checkout branchName
+Borra branch localmente
+> git branch -d branchName
+Borrar branch remotamente
+> git push origin --delete remoteBranchName
+
+
+***===========Mysql===========***
+Conectar al servidor
+> mysql -u bn_moodle -pbitnami -h localhost
+> show databases;
+> use NAMEDATABASE;

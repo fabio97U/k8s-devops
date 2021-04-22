@@ -1,0 +1,13 @@
+Clonar repo
+
+> git clone https://2515652015@dev.azure.com/2515652015/ElearnCloud-Edutec/_git/ElearnCloud_Repo
+> cd ElearnCloud_Repo
+
+	Para entorno On-premise (se puede cambiar la configuracion del despliegue de los archivos .yaml)
+> kubectl apply -f onpremise/
+
+	Para entorno Cloud (se puede cambiar la configuracion del despliegue de los archivos .yaml)
+> kubectl apply -f cloud/
+
+
+> kubetcl get all

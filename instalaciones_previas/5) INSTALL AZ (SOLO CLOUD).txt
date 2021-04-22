@@ -1,0 +1,25 @@
+Link oficial: https://docs.microsoft.com/en-us/cli/azure/install-azure-cli
+
+cluster_k8s: Cluster Name
+Elearn-Resources: Resources name
+
+Conectarse a AKS
+> az account set --subscription 1f10d05a-b601-471c-9c19-7eff9f04d3b3
+> az aks get-credentials --resource-group Elearn-Resources --name cluster_k8s
+
+(Tener instalado previamente un cliente kubectl, puede ser docker desktop habilitado kubernetes)
+> kubectl get all
+
+
+> az upgrade
+> az aks get-credentials --admin --name cluster_k8s --resource-group Elearn-Resources
+> az aks list
+> az aks show --name cluster_k8s --resource-group Elearn-Resources
+
+> az aks browse --name cluster_k8s --resource-group Elearn-Resources
+
+
+--Sevicio conectado con Kubeconfig
+kubeconfig file(quitar las referencias a docker-desktop):
+> kubectl config view --raw
+

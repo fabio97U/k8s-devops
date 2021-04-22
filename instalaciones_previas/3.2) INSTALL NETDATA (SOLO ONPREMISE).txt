@@ -1,0 +1,71 @@
+Link oficial: https://learn.netdata.cloud/docs/agent/packaging/installer/methods/kubernetes
+Variables del SPACES de netdata
+	"TOKEN"
+	"ROOM"
+
+Install
+> helm repo add netdata https://netdata.github.io/helmchart/
+	> bash <(curl -Ss https://my-netdata.io/kickstart-static64.sh) --reinstall
+
+> helm install netdata netdata/netdata
+> kubectl get all
+
+> touch override.yml
+
+parent:
+  claiming:
+    enabled: true
+    token: "TOKEN"
+    rooms: "ROOM"
+
+child:
+  claiming:
+    enabled: true
+    token: "TOKEN"
+    rooms: "ROOM"
+  configs:
+    netdata:
+      data: |
+        [global]
+          memory mode = ram
+          history = 3600
+        [health]
+          enabled = no
+
+
+> helm upgrade -f override.yml netdata netdata/netdata
+
+
+
+
+
+---------NetData
+Iniciar la comunicacion con el dashboard (https://learn.netdata.cloud/docs/agent/health/notifications/#testing-notifications)
+> su -s /bin/bash netdata
+> /usr/libexec/netdata/plugins.d/alarm-notify.sh
+
+
+# become user netdata
+su -s /bin/bash netdata
+
+# enable debugging info on the console
+export NETDATA_ALARM_NOTIFY_DEBUG=1
+
+# send test alarms to sysadmin
+/usr/libexec/netdata/plugins.d/alarm-notify.sh test
+
+# send test alarms to any role
+/usr/libexec/netdata/plugins.d/alarm-notify.sh test "sysadmin"
+
+
+
+
+
+
+
+
+
+
+
+
+

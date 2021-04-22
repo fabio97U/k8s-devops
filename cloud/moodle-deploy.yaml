@@ -1,0 +1,86 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: azure-disk-moodle
+  namespace: edutec
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: default
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: moodle
+  labels:
+    app: moodle
+  namespace: edutec
+spec:
+  ports:
+    - port: 8080
+  selector:
+    app: moodle
+    tier: frontend
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: moodle
+  labels:
+    app: moodle
+  namespace: edutec
+spec:
+  selector:
+    matchLabels:
+      app: moodle
+      tier: frontend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: moodle
+        tier: frontend
+    spec:
+      containers:
+      - image: ado6595/moodle:46
+        name: moodle 
+        env:
+          - name: ALLOW_EMPTY_PASSWORD
+            value: 'yes'
+          - name: MOODLE_DATABASE_HOST
+            value: mariadb-moodle
+          - name: MOODLE_DATABASE_USER
+            value: bn_moodle
+          - name: MOODLE_DATABASE_PASSWORD
+            value: bitnami
+          - name: MOODLE_DATABASE_NAME
+            value: bitnami_moodle 
+        ports:
+          - containerPort: 8080
+            name: moodle
+        volumeMounts:
+            - mountPath: "/bitnami"
+              name: volume
+      volumes:
+        - name: volume
+          persistentVolumeClaim:
+            claimName: azure-disk-moodle
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: moodle-hpa
+  namespace: edutec
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: moodle
+  minReplicas: 5
+  maxReplicas: 8
+  targetCPUUtilizationPercentage: 50

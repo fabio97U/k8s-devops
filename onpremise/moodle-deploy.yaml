@@ -1,0 +1,108 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: moodle-pv
+  labels:
+    app: moodle
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/moodle"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: moodle-pvc
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  selector: 
+    matchLabels: 
+      app: moodle
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: moodle
+  labels:
+    app: moodle
+spec:
+  ports:
+    - port: 8080
+  selector:
+    app: moodle
+    tier: frontend
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: moodle
+  labels:
+    app: moodle
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: moodle
+      tier: frontend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: moodle
+        tier: frontend
+    spec:
+      containers:
+      - image: ado6595/moodle:18
+        name: moodle 
+        env:
+          - name: ALLOW_EMPTY_PASSWORD
+            value: 'yes'
+          - name: MOODLE_DATABASE_HOST
+            value: mariadb-moodle
+          - name: MOODLE_DATABASE_USER
+            value: bn_moodle
+          - name: MOODLE_DATABASE_PASSWORD
+            value: bitnami
+          - name: MOODLE_DATABASE_NAME
+            value: bitnami_moodle 
+        ports:
+          - containerPort: 8080
+            name: moodle
+        resources:
+          requests:
+            memory: "100Mi"
+            cpu: "100m"
+          limits:
+            memory: "500Mi"
+            cpu: "300m"
+        volumeMounts:
+          - mountPath: "/bitnami"
+            name: moodle-vol
+      volumes:
+        - name: moodle-vol
+          persistentVolumeClaim:
+            claimName: moodle-pvc
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: moodle-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: moodle
+  minReplicas: 3
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 50
